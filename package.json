@@ -14,7 +14,6 @@
     "discord.js": "^14.5.0",
     "dotenv": "^16.0.3",
     "lowdb": "^3.0.0",
-    "shelljs": "^0.8.5",
     "snoowrap": "^1.23.0"
   }
 }

@@ -22,12 +22,13 @@ module.exports = class Reddit {
 		try {
 			const memberName = await interaction.user.tag;
 			const discordId = await interaction.user.id;
+			const channelId = interaction.channelId;
 			await this.r.composeMessage({
 				subject: 'Pending Discord Verification',
 				to: username,
 				text: `Hello. I am a bot. A request was made from Discord user **${memberName}** to verify ownership of this Reddit account. If this request was made by you, simply reply to this message with the word **verify** to complete the process. If this request was not made by you, please reply to this message with the word **cancel** to deny and remove the request from this bot. This is an automated message and this inbox is not monitored. If you have any questions or concerns, please contact u/symmetricalboy.`,
 			});
-			await this.setOngoingVerification(username, discordId, interaction.guildId);
+			await this.setOngoingVerification(username, discordId, channelId, interaction.guildId);
 			await interaction.reply({ content: `A private message has been sent to the requested Reddit username. Reply to this Reddit message with the word **verify** to complete the process. If the message does not appear in your inbox on Reddit, it is likely being blocked by Reddit's filters. You can still complete the verification by sending a new message to the bot. Create a new private message to u/${process.env.REDDIT_ACCOUNT_NAME} with the body of the message being the word **verify**. This will complete the process the same as a reply.`, ephemeral: false });
 		}
 		catch (err) {
@@ -60,10 +61,10 @@ module.exports = class Reddit {
 		try {
 			const ongoingVerifications = Bot.getGuildValue(guildId, 'ongoingVerifications') || {};
 			try {
-				const channelId = Bot.getGuildValue(guildId, 'verificationChannelId');
+				const channelId = ongoingVerifications[username].channelId;
 				if (channelId) {
 					const channel = await (await Bot.client.guilds.fetch(guildId)).channels.fetch(channelId);
-					await channel?.send({ content: `${userMention(ongoingVerifications[username])}, your requested verification has been denied or cancelled. Please try again.` });
+					await channel?.send({ content: `${userMention(ongoingVerifications[username].userId)}, your requested verification has been denied or cancelled. Please try again.` });
 				}
 			}
 			catch (err) { }
@@ -78,7 +79,7 @@ module.exports = class Reddit {
 		try {
 			const ongoingVerifications = Bot.getGuildValue(guildId, 'ongoingVerifications') || {};
 			const guild = await Bot.client.guilds.fetch(guildId);
-			const member = await guild.members.fetch(ongoingVerifications[username]);
+			const member = await guild.members.fetch(ongoingVerifications[username].userId);
 			try {
 				await member.setNickname('u/' + username);
 			}
@@ -100,10 +101,10 @@ module.exports = class Reddit {
 				}
 			}
 			try {
-				const channelId = Bot.getGuildValue(guildId, 'verificationChannelId');
+				const channelId = ongoingVerifications[username].channelId;
 				if (channelId) {
 					const channel = await (await Bot.client.guilds.fetch(guildId)).channels.fetch(channelId);
-					await channel?.send({ content: `${userMention(ongoingVerifications[username])}, your Reddit username has been successfully verified and connected to your Discord username. Thank you!` });
+					await channel?.send({ content: `${userMention(ongoingVerifications[username].userId)}, your Reddit username has been successfully verified and connected to your Discord username. Thank you!` });
 				}
 			}
 			catch (err) { }
@@ -114,9 +115,9 @@ module.exports = class Reddit {
 			await Debug.log(err);
 		}
 	}
-	static async setOngoingVerification(username, userId, guildId) {
+	static async setOngoingVerification(username, userId, channelId, guildId) {
 		const ongoingVerifications = Bot.getGuildValue(guildId, 'ongoingVerifications') || {};
-		ongoingVerifications[username] = userId;
+		ongoingVerifications[username] = { userId, channelId };
 		await Bot.setGuildValue(guildId, 'ongoingVerifications', ongoingVerifications);
 	}
 	static async removeVerification(username, guildId) {
