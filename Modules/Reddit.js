@@ -103,7 +103,7 @@ module.exports = class Reddit {
 				const channelId = Bot.getGuildValue(guildId, 'verificationChannelId');
 				if (channelId) {
 					const channel = await (await Bot.client.guilds.fetch(guildId)).channels.fetch(channelId);
-					await channel?.send({ content: `${userMention(ongoingVerifications[username])}, your Reddit username (${username}) has been successfully verified and connected to your Discord username. Thank you!` });
+					await channel?.send({ content: `${userMention(ongoingVerifications[username])}, your Reddit username has been successfully verified and connected to your Discord username. Thank you!` });
 				}
 			}
 			catch (err) { }
