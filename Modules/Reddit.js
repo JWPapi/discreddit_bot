@@ -39,7 +39,7 @@ module.exports = class Reddit {
 	static async verificationLoop() {
 		const inbox = await this.r.getInbox();
 		for (const message of inbox) {
-			for (const guild of Bot.client.guilds.cache) {
+			for (const guild of (await Bot.client.guilds.fetch())) {
 				if (this.isAlreadyVerifying(message.author.name, guild[0])) {
 					const response = message.body.toLowerCase();
 					if (response.indexOf('verify') != -1) {
