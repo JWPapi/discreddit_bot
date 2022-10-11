@@ -75,7 +75,12 @@ module.exports = class Bot {
 			}
 			catch (error) {
 				await Debug.log(error);
-				await interaction.reply({ content: 'Something went wrong...', ephemeral: false });
+				try {
+					await interaction.reply({ content: 'Something went wrong...', ephemeral: false });
+					}
+				catch (err) {
+					await Debug.log(err);
+				}
 			}
 		});
 	}
