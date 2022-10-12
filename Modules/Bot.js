@@ -63,7 +63,7 @@ module.exports = class Bot {
 			this.commands.set(command.data.name, command);
 		}
 		this.client.once('ready', () => {
-			console.log('Bot Started.');
+			console.log('~ u/discreddit_bot is now online ~');
 		});
 		this.client.on('interactionCreate', async interaction => {
 			try {
@@ -76,7 +76,7 @@ module.exports = class Bot {
 			catch (error) {
 				await Debug.log(error);
 				try {
-					await interaction.reply({ content: 'Something went wrong...', ephemeral: false });
+					await interaction.reply({ content: `Sorry. Something doesn't look right with that request. Please try again.`, ephemeral: false });
 					}
 				catch (err) {
 					await Debug.log(err);
@@ -101,7 +101,7 @@ module.exports = class Bot {
 		const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 		try {
 			await rest.put(Routes.applicationCommands(process.env.DISCORD_CLIENT_ID), { body: commands });
-			console.log('Successfully registered application commands.');
+			console.log('u/discreddit_bot has successfully registered application commands in a Discord guild.');
 		}
 		catch (err) {
 			await Debug.log(err);

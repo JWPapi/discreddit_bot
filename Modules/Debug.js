@@ -6,7 +6,7 @@ module.exports = class Debug {
 	}
 
 	static async restart() {
-		console.log('Restarting...');
+		console.log('u/discreddit_bot is restarting...');
 		process.exit(2);
 	}
 };

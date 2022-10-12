@@ -16,7 +16,7 @@ module.exports = class Reddit {
 	}
 	static async startVerification(username, interaction) {
 		if (this.isAlreadyVerifying(username, interaction.guildId)) {
-			await interaction.reply({ content: 'There is already a pending verification request for this username. Please reply to the private message on Reddit to complete the process.', ephemeral: false });
+			await interaction.reply({ content: `There is already a pending verification request for **u/${username}**.`, ephemeral: false });
 			return;
 		}
 		try {
@@ -26,21 +26,21 @@ module.exports = class Reddit {
 			await this.r.composeMessage({
 				subject: 'Pending Discord Verification',
 				to: username,
-				text: `Hello. I am a bot. A request was made from Discord user **${memberName}** to verify ownership of this Reddit account. If this request was made by you, simply reply to this message with the word **verify** to complete the process. If this request was not made by you, please reply to this message with the word **cancel** to deny and remove the request from this bot. This is an automated message and this inbox is not monitored. If you have any questions or concerns, please contact u/symmetricalboy.`,
+				text: `Hello. I am a bot. A request was made from the Discord username **${memberName}** to verify their ownership of this Reddit account. If this request was made by you, please reply to this message with the word **verify** to complete the process. If this request was not made by you, please reply to this message with the word **cancel** to deny and remove the request from this bot. This is an automated message and this inbox is not monitored. If you have any questions or concerns, please contact u/symmetricalboy on Reddit or Gori#0001 on Discord.`,
 			});
 			await this.setOngoingVerification(username, discordId, channelId, interaction.guildId);
-			await interaction.reply({ content: `A private message has been sent to the requested Reddit username. Reply to this Reddit message with the word **verify** to complete the process. If the message does not appear in your inbox on Reddit, it is likely being blocked by Reddit's filters. You can still complete the verification by sending a new message to the bot. Create a new private message to u/${process.env.REDDIT_ACCOUNT_NAME} with the body of the message being the word **verify**. This will complete the process the same as a reply.`, ephemeral: false });
+			await interaction.reply({ content: `A private message from **u/discreddit_bot** has been sent to **u/${username}**. Please check your Reddit inbox to complete verification.`, ephemeral: false });
 		}
 		catch (err) {
 			await Debug.log(err);
-			await interaction.reply({ content: 'Something went wrong...', ephemeral: false });
+			await interaction.reply({ content: 'Sorry. Something went wrong. Do you have private messages on Reddit disabled?', ephemeral: false });
 		}
 	}
 
 	static async verificationLoop() {
 		const inbox = await this.r.getInbox();
 		for (const message of inbox) {
-			for (const guild of (await Bot.client.guilds.fetch())) {
+			for (const guild of Bot.client.guilds.cache) {
 				if (this.isAlreadyVerifying(message.author.name, guild[0])) {
 					const response = message.body.toLowerCase();
 					if (response.indexOf('verify') != -1) {
@@ -64,7 +64,7 @@ module.exports = class Reddit {
 				const channelId = ongoingVerifications[username].channelId;
 				if (channelId) {
 					const channel = await (await Bot.client.guilds.fetch(guildId)).channels.fetch(channelId);
-					await channel?.send({ content: `${userMention(ongoingVerifications[username].userId)}, your requested verification has been denied or cancelled. Please try again.` });
+					await channel?.send({ content: `${userMention(ongoingVerifications[username].userId)}, your requested verification has been denied or canceled. Please try again.` });
 				}
 			}
 			catch (err) { }

@@ -6,10 +6,10 @@ module.exports = {
 		.setDefaultMemberPermissions(2048)
 		.setDMPermission(false)
 		.setName('verify')
-		.setDescription('Start the verification process. To access this server, you must verify a Reddit account.')
+		.setDescription('Verify your Reddit username.')
 		.addStringOption(option =>
 			option.setName('reddit_username')
-				.setDescription('Your Reddit username to be verified.')
+				.setDescription('The Reddit username to be verified.')
 				.setRequired(true)),
 
 	/** @param {Interaction} interaction*/
@@ -20,7 +20,7 @@ module.exports = {
 		}
 		catch (err) {
 			await Debug.log(err);
-			await interaction.reply({ content: 'Something went wrong...', ephemeral: false });
+			await interaction.reply({ content: 'Sorry. Something went wrong with that request. Please try again.', ephemeral: false });
 		}
 	},
 };
